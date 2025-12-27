@@ -35,8 +35,8 @@ translation = {
         "en": "... ",
     },
     "welcome": {
-        "zh": "欢迎来到TwT2.4！",
-        "en": "Welcome to TwT2.4! "
+        "zh": "欢迎来到TwT2.3！",
+        "en": "Welcome to TwT2.3! "
     },
     "chat.name": {
         "zh": "（NAME）",

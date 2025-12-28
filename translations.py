@@ -14,6 +14,10 @@ translation = {
         "zh": "错误：",
         "en": "Error: ",
     },
+    "error.message.load": {
+        "zh": "加载消息时`KEY`有问题",
+        "en": "Failed to load message because `KEY` was wrong",
+    },
     "error.config.load": {
         "zh": "加载配置`CONFIG`时有问题",
         "en": "Failed to load config `CONFIG`",

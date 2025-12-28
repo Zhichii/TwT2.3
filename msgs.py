@@ -15,12 +15,19 @@ class MsgBase:
         return {"role": self.role, "content": self.content}
     @staticmethod
     def load(data : dict):
+        if "content" not in data:
+            raise ValueError("`content` not in data")
+        if "role" not in data:
+            log.error(t("error.message.load").replace("KEY", "role"))
+            return MsgBase("user", data["content"])
         return MsgBase(data["role"], data["content"])
 class UserMsg(MsgBase):
     def __init__(self, content: str = ""):
         super().__init__("user", content)
     @staticmethod
     def load(data : dict):
+        if "content" not in data:
+            raise ValueError("`content` not in data")
         return UserMsg(data["content"])
 class AssistantMsg(MsgBase):
     def __init__(self, content: str = ""):
@@ -30,6 +37,8 @@ class AssistantMsg(MsgBase):
         return data
     @staticmethod
     def load(data : dict):
+        if "content" not in data:
+            raise ValueError("`content` not in data")
         return AssistantMsg(data["content"])
 class ReasonAssistantMsg(MsgBase):
     reason: str = ""
@@ -42,12 +51,17 @@ class ReasonAssistantMsg(MsgBase):
         return data
     @staticmethod
     def load(data : dict):
+        if "content" not in data:
+            raise ValueError("`content` not in data")
+        if "reason" not in data:
+            log.error(t("error.message.load").replace("KEY", "reason"))
+            return AssistantMsg(data["content"])
         return ReasonAssistantMsg(data["content"], data["reason"])
 class Conversation:
     class MsgWrapper:
         type : str
         msg : MsgBase
-        parnet : int | None
+        parent : int | None
         children : list[int]
         child : int | None
         time : float
@@ -85,11 +99,11 @@ class Conversation:
     def __repr__(self):
         return str(self.store())
     def store(self):
-        return {'conversation': self.conversation}
+        return {'conversation': [i.store() for i in self.conversation]}
     @staticmethod
     def load(data : dict):
         conversation = Conversation()
-        conversation.conversation = data["conversation"]
+        conversation.conversation = [Conversation.MsgWrapper.load(i) for i in data["conversation"]]
         return conversation
     def append(self, msg : MsgBase):
         if len(self.conversation) == 0:

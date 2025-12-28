@@ -34,8 +34,8 @@ def provider_test():
 class Config:
     def __init__(self, path: str = "", default: dict = {}):
         self.path = path
-        self.default = dict(default)
-        self.data = dict(self.default)
+        self.default = copy.deepcopy(default)
+        self.data = copy.deepcopy(self.default)
         if (os.path.exists(path)):
             self.load()
         self.save() # 格式化
@@ -46,9 +46,12 @@ class Config:
         except Exception as e:
             log.error(t("error.config.load").replace("CONFIG", self.path), e)
     def save(self):
+        if not self.path:
+            log.error(t("error.config.save").replace("CONFIG", self.path), e)
         try:
-            with open(self.path, "w") as fp:
+            with open(self.path+".tmp", "w") as fp:
                 json.dump(self.data, fp, ensure_ascii=False, indent=4)
+            os.replace(self.path+".tmp",self.path)
         except Exception as e:
             log.error(t("error.config.save").replace("CONFIG", self.path), e)
     def __repr__(self):

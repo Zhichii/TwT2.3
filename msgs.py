@@ -6,57 +6,78 @@ from translations import translate as t
 class MsgBase:
     role: str = ""
     content: str = ""
-    def __init__(self, role: str = "", content = ""):
-        self.role = role
-        self.content = content
-    def __repr__(self):
-        return str(self.store())
-    def store(self):
-        return {"role": self.role, "content": self.content}
+    def __init__(this, role: str = "", content = ""):
+        this.role = role
+        this.content = content
+    def __repr__(this):
+        return str(this.store())
+    def store(this):
+        return {"role": this.role, "content": this.content}
     @staticmethod
     def load(data : dict):
         if "content" not in data:
-            raise ValueError("`content` not in data")
+            log.error(t("error.message.load").replace("KEY", "content"))
+            content = ""
+        else: content = data["content"]
         if "role" not in data:
             log.error(t("error.message.load").replace("KEY", "role"))
-            return MsgBase("user", data["content"])
-        return MsgBase(data["role"], data["content"])
+            role = "user"
+        else: role = data["role"]
+        return MsgBase(role, content)
 class UserMsg(MsgBase):
-    def __init__(self, content: str = ""):
+    def __init__(this, content: str = ""):
         super().__init__("user", content)
     @staticmethod
     def load(data : dict):
         if "content" not in data:
-            raise ValueError("`content` not in data")
+            return UserMsg("")
         return UserMsg(data["content"])
 class AssistantMsg(MsgBase):
-    def __init__(self, content: str = ""):
+    def __init__(this, content: str = "", interrupted : bool = False):
         super().__init__("assistant", content)
-    def store(self):
+        this.interrupted = interrupted
+    def store(this):
         data = super().store()
+        data["interrupted"] = this.interrupted
         return data
     @staticmethod
     def load(data : dict):
-        if "content" not in data:
-            raise ValueError("`content` not in data")
-        return AssistantMsg(data["content"])
+        if ("content" not in data) or (not isinstance(data["content"], str)):
+            log.error(t("error.message.load").replace("KEY", "content"))
+            content = ""
+        else: content = data["content"]
+        if ("interrupted" not in data) or (not isinstance(data["interrupted"], bool)):
+            log.error(t("error.message.load").replace("KEY", "interrupted"))
+            interrupted = False
+        else: interrupted = data["interrupted"]
+        if ("reason" in data) and (isinstance(data["reason"], str)):
+            return ReasonAssistantMsg(content, data["reason"], interrupted)
+        return AssistantMsg(content, interrupted)
 class ReasonAssistantMsg(MsgBase):
     reason: str = ""
-    def __init__(self, content: str = "", reason: str = ""):
+    def __init__(this, content: str = "", reason: str = "", interrupted : bool = False):
         super().__init__("assistant", content)
-        self.reason = reason
-    def store(self):
+        this.reason = reason
+        this.interrupted = interrupted
+    def store(this):
         data = super().store()
-        data["reason"] = self.reason
+        data["reason"] = this.reason
         return data
     @staticmethod
     def load(data : dict):
-        if "content" not in data:
-            raise ValueError("`content` not in data")
-        if "reason" not in data:
+        if ("content" not in data) or (not isinstance(data["content"], str)):
+            log.error(t("error.message.load").replace("KEY", "content"))
+            content = ""
+        else: content = data["content"]
+        if ("interrupted" not in data) or (not isinstance(data["interrupted"], bool)):
+            log.error(t("error.message.load").replace("KEY", "interrupted"))
+            interrupted = False
+        else: interrupted = data["interrupted"]
+        if ("reason" not in data) or (not isinstance(data["reason"], str)):
             log.error(t("error.message.load").replace("KEY", "reason"))
-            return AssistantMsg(data["content"])
-        return ReasonAssistantMsg(data["content"], data["reason"])
+            return AssistantMsg(content, interrupted)
+        else:
+            return ReasonAssistantMsg(content, data["reason"], interrupted)
 class MsgTree:
     class MsgWrapper:
         type : str
@@ -65,17 +86,17 @@ class MsgTree:
         children : list[int]
         child : int | None
         time : float
-        def __init__(self, msg : MsgBase, parent : int | None):
-            self.type = type(msg).__name__
-            self.msg = msg
-            self.parent = parent
-            self.children = []
-            self.child = None
-            self.time = time.time()
-        def __repr__(self):
-            return str(self.store())
-        def store(self):
-            return {"type": self.type, "msg": self.msg.store(), "time": self.time, "parent": self.parent, "children": list(self.children), "child": self.child}
+        def __init__(this, msg : MsgBase, parent : int | None):
+            this.type = type(msg).__name__
+            this.msg = msg
+            this.parent = parent
+            this.children = []
+            this.child = None
+            this.time = time.time()
+        def __repr__(this):
+            return str(this.store())
+        def store(this):
+            return {"type": this.type, "msg": this.msg.store(), "time": this.time, "parent": this.parent, "children": list(this.children), "child": this.child}
         @staticmethod
         def load(data : dict):
             if "type" not in data:
@@ -119,26 +140,52 @@ class MsgTree:
                 msg.child = data["child"]
             return msg
     msg_list : list[MsgWrapper]
-    def __init__(self, system : str = ""):
-        self.msg_list = []
-        self.append(MsgBase()) # 根消息
-        self.append(MsgBase("system", system))
-    def __repr__(self):
-        return str(self.store())
-    def store(self):
-        return {'conversation': [i.store() for i in self.msg_list]}
+    def __init__(this, system : str = ""):
+        this.msg_list = []
+        this.append(MsgBase()) # 根消息
+        this.append(MsgBase("system", system))
+    def __repr__(this):
+        return str(this.store())
+    def store(this):
+        return {'conversation': [i.store() for i in this.msg_list]}
     @staticmethod
     def load(data : dict):
         msg_tree = MsgTree()
         msg_tree.msg_list = [MsgTree.MsgWrapper.load(i) for i in data["conversation"]]
         return msg_tree
-    def append(self, msg : MsgBase):
-        if len(self.msg_list) == 0:
-            self.msg_list.append(MsgTree.MsgWrapper(msg, None))
+    def get_last_msg_id(this) -> None | int:
+        if len(this.msg_list) == 0:
+            return None
         else:
             cur = 0
-            while self.msg_list[cur].child is not None:
-                cur = self.msg_list[cur].children[self.msg_list[cur].child]
-            self.msg_list[cur].children.append(len(self.msg_list))
-            self.msg_list.append(MsgTree.MsgWrapper(msg, cur))
-            self.msg_list[cur].child = len(self.msg_list[cur].children)-1
+            while this.msg_list[cur].child is not None:
+                cur = this.msg_list[cur].children[this.msg_list[cur].child]
+            return cur
+    def append(this, msg : MsgBase):
+        if len(this.msg_list) == 0:
+            this.msg_list.append(MsgTree.MsgWrapper(msg, None))
+        else:
+            cur = 0
+            while this.msg_list[cur].child is not None:
+                cur = this.msg_list[cur].children[this.msg_list[cur].child]
+            this.msg_list[cur].children.append(len(this.msg_list))
+            this.msg_list.append(MsgTree.MsgWrapper(msg, cur))
+            this.msg_list[cur].child = len(this.msg_list[cur].children)-1
+    def complete_last_assistant(this, idx : int, msg : AssistantMsg | ReasonAssistantMsg):
+        if not this.ends_with_assistant():
+            return
+        if 0 <= idx < len(this.msg_list):
+            this.msg_list[idx].msg.content += msg.content
+            if this.msg_list[idx].type == "ReasonAssistantMsg":
+                if isinstance(msg, ReasonAssistantMsg):
+                    this.msg_list[idx].msg.reason += msg.reason
+            this.msg_list[idx].time = time.time()
+            this.msg_list[idx].msg.interrupted = msg.interrupted
+        else:
+            raise ValueError("message list index out of range")
+    def ends_with_assistant(this):
+        last_msg_id = this.get_last_msg_id()
+        if last_msg_id is None:
+            return False
+        else:
+            return this.msg_list[last_msg_id].type in ("AssistantMsg","ReasonAssistantMsg",)

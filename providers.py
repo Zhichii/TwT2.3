@@ -1,7 +1,7 @@
-import msgs
-import openai
-import anthropic
-import log
+import openai, anthropic
+import msgs, log
+from tools import merge
+from typing import Any
 
 class OpenAIProvider:
     def __init__(self, base_url : str, api_key : str):
@@ -31,9 +31,9 @@ class OpenAIProvider:
                 else:
                     messages.append({"role": "assistant", "content": msg.msg.content, "reasoning_content": msg.msg.reason})
         return messages
-    def __call__(self, model : str, msg_tree : msgs.MsgTree, max_tokens : int = 4096, stream : bool = True):
+    def __call__(self, model : str, msg_tree : msgs.MsgTree, max_tokens : int = 4096, stream : bool = True, **kwargs):
         messages = self._to_format(msg_tree)
-        for chunk in self.client.chat.completions.create(model=model, messages=messages, stream=stream):
+        for chunk in self.client.chat.completions.create(model=model, messages=messages, stream=stream, max_tokens=max_tokens, extra_body=kwargs):
             delta = chunk.choices[0].delta
             if hasattr(delta, "reasoning_content") and delta.reasoning_content:
                 yield ("reason", delta.reasoning_content)
@@ -65,7 +65,7 @@ class AnthropicProvider:
                 else:
                     log.error("the tag and the type are not the same")
         return (messages, "\n".join(system), )
-    def __call__(self, model : str, msg_tree : msgs.MsgTree, max_tokens : int = 4096, stream : bool = True):
+    def __call__(self, model : str, msg_tree : msgs.MsgTree, max_tokens : int = 4096, stream : bool = True, **kwargs):
         messages, system = self._to_format(msg_tree)
         for chunk in self.client.messages.create(max_tokens=max_tokens, messages=messages, system=system, model=model, stream=stream):
             if chunk.type == "content_block_delta":

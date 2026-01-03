@@ -30,25 +30,25 @@ translation = {
         "en": "`VAR` in config was not valid",
         "ja": "設定内の`VAR`が無効です"
     },
-    "error.chat.load": {
-        "zh": "加载对话时`KEY`有问题",
-        "en": "Failed to load chat because `KEY` was wrong",
-        "ja": "`KEY`が正しくないため、チャットの読み込みに失敗しました"
+    "error.load": {
+        "zh": "加载CATEGORY时`KEY`有问题，以`DEFAULT`代替",
+        "en": "Failed to load CATEGORY because `KEY` was wrong, replacing with `DEFAULT`",
+        "ja": "`KEY`が正しくないため、CATEGORYの読み込みに失敗しました"
     },
-    "error.message.load": {
-        "zh": "加载消息时`KEY`有问题",
-        "en": "Failed to load message because `KEY` was wrong",
-        "ja": "`KEY`が正しくないため、メッセージの読み込みに失敗しました"
+    "error.load.message": {
+        "zh": "消息",
+        "en": "message",
+        "ja": "メッセージ",
     },
-    "error.message.type_unknown": {
-        "zh": "我不认识消息类型`TYPE`",
-        "en": "Unknown message type `TYPE`",
-        "ja": "不明なメッセージタイプ`TYPE`です"
+    "error.load.provider": {
+        "zh": "提供商",
+        "en": "provider",
+        "ja": "プロバイダー"
     },
-    "error.provider.load": {
-        "zh": "加载提供商时`KEY`有问题",
-        "en": "Failed to load provider because `KEY` was wrong",
-        "ja": "`KEY`が正しくないため、プロバイダーの読み込みに失敗しました"
+    "error.load.chat": {
+        "zh": "对话",
+        "en": "chat",
+        "ja": "チャット"
     },
     "whisper": {
         "zh": "……",

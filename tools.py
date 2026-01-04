@@ -3,7 +3,7 @@ from typing import Literal, Any
 from translations import translate as t
 from copy import deepcopy
 
-def safe_get(data : dict[str, Any], type : type | tuple[type, ...], key : str, category : Literal["message", "provider", "model"], default : Any) -> Any:
+def safe_get(data : dict[str, Any], type : type | tuple[type, ...], key : str, category : Literal["message", "provider", "model", "chat"], default : Any) -> Any:
     if (key in data) and (isinstance(data[key], type)):
         return data[key]
     else:

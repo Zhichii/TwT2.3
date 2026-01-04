@@ -61,9 +61,9 @@ translation = {
         "ja": "TwT2.3へようこそ！"
     },
     "help": {
-        "zh": "/new - 创建新的对话\n/models - 添加服务提供商或模型\n/exit - 退出",
-        "en": "/new - Create a new chat\n/models - Add service providers or models\n/exit - Exit the program",
-        "ja": "/new - 新しいチャットを作成\n/models - サービスプロバイダーまたはモデルを追加\n/exit - プログラムを終了"
+        "zh": "/new - 创建新的对话\n/models - 添加提供商或选择当前模型\n/providers - 添加服务提供商或选择默认模型\n/exit - 退出",
+        "en": "/new - Create a new chat\n/models - Add service providers or select a current model\n/providers - Add service providers or select a default model\n/exit - Exit the program",
+        "ja": "/new - 新しいチャットを開始\n/models - サービスプロバイダーを追加、または利用モデルを選択\n/providers - サービスプロバイダーを追加、またはデフォルトモデルを選択\n/exit - プログラムを終了"
     },
     "chat.title": {
         "zh": "（TITLE）",
@@ -74,5 +74,9 @@ translation = {
         "zh": "新对话",
         "en": "New Chat",
         "ja": "新規チャット"
+    },
+    "providers.empty": {
+        "zh": "（无）",
+        "en": " (Empty) "
     }
 }

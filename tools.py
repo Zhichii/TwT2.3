@@ -7,7 +7,7 @@ def safe_get(data : dict[str, Any], type : type | tuple[type, ...], key : str, c
     if (key in data) and (isinstance(data[key], type)):
         return data[key]
     else:
-        log.error(t(f"error.load").replace("CATEGORY", t(category)).replace("KEY", key).replace("DEFAULT", repr(default)))
+        log.error(t(f"error.load").replace("CATEGORY", t(f"error.load.{category}")).replace("KEY", key).replace("DEFAULT", repr(default)))
         return default
 
 def merge_list(data_dst : list[Any], data_src : list[Any]):

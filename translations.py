@@ -45,10 +45,20 @@ translation = {
         "en": "provider",
         "ja": "プロバイダー"
     },
+    "error.load.model": {
+        "zh": "模型",
+        "en": "model",
+        "ja": "モデル"
+    },
     "error.load.chat": {
         "zh": "对话",
         "en": "chat",
         "ja": "チャット"
+    },
+    "error.provider.no": {
+        "zh": "未添加提供商或未选择模型。请输入/models或/providers并确保至少有一个提供商和一个模型。",
+        "en": "",
+        "ja": ""
     },
     "whisper": {
         "zh": "……",
@@ -56,14 +66,28 @@ translation = {
         "ja": "……"
     },
     "welcome": {
-        "zh": "欢迎来到TwT2.3！",
-        "en": "Welcome to TwT2.3! ",
-        "ja": "TwT2.3へようこそ！"
+        "zh": "欢迎来到TwT2.3！\n（语言不保证100%准确）\n (The language is not guaranteed to be 100% accurate) ",
+        "en": "Welcome to TwT2.3! \n (The translation into other languages is done by AI and is not guaranteed to be 100% accurate) \n（其它语言翻译由AI完成，不保证100%准确）",
+        "ja": "TwT2.3へようこそ！\n（他の言語への翻訳はAIによって行われており、100%正確であることを保証するものではありません）\n（其它语言翻译由AI完成，不保证100%准确）\n (The translation into other languages is done by AI and is not guaranteed to be 100% accurate) "
     },
     "help": {
-        "zh": "/new - 创建新的对话\n/models - 添加提供商或选择当前模型\n/providers - 添加服务提供商或选择默认模型\n/exit - 退出",
-        "en": "/new - Create a new chat\n/models - Add service providers or select a current model\n/providers - Add service providers or select a default model\n/exit - Exit the program",
-        "ja": "/new - 新しいチャットを開始\n/models - サービスプロバイダーを追加、または利用モデルを選択\n/providers - サービスプロバイダーを追加、またはデフォルトモデルを選択\n/exit - プログラムを終了"
+        "zh": """/new - 创建新的对话
+/models - 添加提供商或选择当前模型
+/providers - 添加服务提供商或选择默认模型
+/exit - 退出""",
+        "en": """/new - Create a new chat
+/models - Add service providers or select a current model
+/providers - Add service providers or select a default model
+/exit - Exit the program""",
+        "ja": """/new - 新しいチャットを開始
+/models - サービスプロバイダーを追加、または利用モデルを選択
+/providers - サービスプロバイダーを追加、またはデフォルトモデルを選択
+/exit - プログラムを終了"""
+    },
+    "help.models": {
+        "zh": "O键 - 添加一个提供商",
+        "en": "",
+        "ja": ""
     },
     "chat.title": {
         "zh": "（TITLE）",
@@ -78,5 +102,17 @@ translation = {
     "providers.empty": {
         "zh": "（无）",
         "en": " (Empty) "
+    },
+    "provider.name.ask": {
+        "zh": "请输入提供商名称（直接按下回车则取消）："
+    },
+    "provider.url.ask": {
+        "zh": "请输入提供商API地址（直接按下回车则取消；需符合[bold red]https://[/]api.openai.com/v1[bold red]/[/]格式）："
+    },
+    "provider.key.ask": {
+        "zh": "（请输入密钥（直接按下回车则取消）："
+    },
+    "provider.type.ask": {
+        "zh": "请选择提供商类型"
     }
 }

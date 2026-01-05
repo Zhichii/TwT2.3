@@ -296,9 +296,9 @@ class Providers:
                             index += 1
                     provideri += 1
             cache = "\n".join(cache)
-            print("\033c", end=cache+"\n"+t("help.models"))
+            print("\033c", end=cache+"\n"+t("help.models")+"\n")
             k = getkey()
-            if k in ['z', 'Z', '\x04', '\r', '\n', '\x03','x','X']:
+            if k in ['z', 'Z', '\x04', '\r', '\n', '\x03', 'x', 'X']:
                 break
             if k in ['w','W',('UP',b'\x1b[A')]:
                 if isinstance(target, int):
@@ -306,6 +306,47 @@ class Providers:
             if k in ['s','S',('DOWN',b'\x1b[B')]:
                 if isinstance(target, int):
                     if target + 1 < index: target += 1 # index实际上作为所有可选中的总数
+            if k in ['o','O']:
+                try:
+                    log.console.print(t("provider.name.ask"))
+                    name = input().strip()
+                    if not name: continue
+                    log.console.print(t("provider.url.ask"))
+                    url = input().strip()
+                    if not url: continue
+                    log.console.print(t("provider.key.ask"))
+                    key = input().strip()
+                    if not key: continue
+                    log.console.print(t("provider.type.ask"))
+                    provider_type : Literal["openai","anthropic","cancel"] = "openai"
+                    while True:
+                        if provider_type == "openai":
+                            print("\r[OpenAI] Anthropic  Cancel ", end="")
+                        elif provider_type == "anthropic":
+                            print("\r OpenAI [Anthropic] Cancel ", end="")
+                        else:
+                            print("\r OpenAI  Anthropic [Cancel]", end="")
+                        k = getkey()
+                        if k in ['w','W','a','A',('UP',b'\x1b[A'),('LEFT',b'\x1b[D')]:
+                            if provider_type == "openai": provider_type = "cancel"
+                            elif provider_type == "anthropic": provider_type = "openai"
+                            elif provider_type == "cancel": provider_type = "anthropic"
+                        if k in ['s','S','d','D',('DOWN',b'\x1b[B'),('RIGHT',b'\x1b[C')]:
+                            if provider_type == "openai": provider_type = "anthropic"
+                            elif provider_type == "anthropic": provider_type = "cancel"
+                            elif provider_type == "cancel": provider_type = "openai"
+                        if k in ['\r','\n',' ']:
+                            break
+                        if k in ['\x03','\x04']:
+                            provider_type = "cancel"
+                            break
+                    if provider_type == "cancel":
+                        continue
+                except KeyboardInterrupt:
+                    continue
+                self.providers.append(Provider(name, url, key, provider_type))
+                self.cfg["providers"].append(self.providers[-1].store())
+                self.cfg.save()
         print("\033c", end="")
         return provider_index, provider_model
 
@@ -342,6 +383,7 @@ class Chat:
         return self.msg_tree.ends_with_assistant()
     def complete_last_assistant(self, idx : int, msg : msgs.AssistantMsg | msgs.ReasonAssistantMsg):
         self.msg_tree.complete_last_assistant(idx, msg)
+
 class Chats:
     cfg : Config
     providers : Providers
@@ -401,17 +443,19 @@ class Chats:
             self.cfg["chats"][self.chat_index] = self.the_chat.store()
             self.cfg.save()
         ends_with_assistant = self.the_chat.ends_with_assistant()
-        reasons = []
-        contents = []
-        interrupt = False
-        #print(client._to_format(self.the_chat.msg_tree))
+        if ends_with_assistant:
+            return
         if (self.the_chat.provider_index is None) or (self.the_chat.provider_model is None):
             log.error(t("error.provider.no"))
             return
+        #print(client._to_format(self.the_chat.msg_tree))
         gen = self.providers.generate(self.the_chat.provider_index, self.the_chat.provider_model)
         if gen is None:
             log.error("that can't be true! ")
             return
+        reasons = []
+        contents = []
+        interrupt = False
         state : Literal["content", "reason"] = "content"
         try:
             for i in self.providers.providers[self.the_chat.provider_index].client(gen[0], self.the_chat.msg_tree, gen[1], True, **gen[2]):
@@ -433,6 +477,7 @@ class Chats:
                     contents.append(i[1])
         except KeyboardInterrupt as e:
             interrupt = True
+        print()
         reason = "".join(reasons)
         content = "".join(contents)
         # 因为续写似乎并不是都支持
@@ -469,6 +514,7 @@ class App:
         self.providers = Providers(self.cfg)
         self.chats = Chats(self.cfg, self.providers)
     def run(self):
+        log.console.print(t("welcome"))
         self.load_chat()
         ready_model = (self.cfg["provider_index"], self.cfg["provider_model"])
         while True:
@@ -495,7 +541,6 @@ class App:
             else:
                 msg = i
                 self.chats.user_msg_send(msg)
-                print()
         print()
     def load_chat(self):
         self.chats.load_chat()

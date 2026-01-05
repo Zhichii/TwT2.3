@@ -38,7 +38,7 @@ def length(string) -> int:
 def linux_input(prompt : str):
     print(prompt, end="", flush=True)
     cache = []
-    ptr = 0
+    ptr = 0 # 代表光标在第ptr个字符前面。ptr从0开始。
     while True:
         k = getch.getkey()
         if isinstance(k, tuple):

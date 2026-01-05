@@ -125,10 +125,9 @@ class MsgTree:
             msg_wrapper.child = child
             return msg_wrapper
     msg_list : list[MsgWrapper]
-    def __init__(self, system : str = ""):
+    def __init__(self):
         self.msg_list = []
-        self.append(MsgBase()) # 根消息
-        self.append(MsgBase("system", system))
+        self.append(MsgBase("system", "")) # 根消息，也是系统消息。
     def __repr__(self) -> str:
         return str(self.store())
     def store(self) -> dict[str, Any]:
